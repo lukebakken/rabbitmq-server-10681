@@ -1,27 +1,24 @@
-.PHONY: clean down fresh image-3.8 image-3.10 import up
+.PHONY: clean down perms rmq-perms up
 
-clean: down
-	sudo chown -R "$(USER):$(USER)" data log
+clean: down perms
 	rm -rf $(CURDIR)/data/*/rabbit*
-	rm -rf $(CURDIR)/log/*/*
-	sudo chown -R "999:999" data log
+	rm -rf $(CURDIR)/log/*.log
 
 down:
 	docker compose down
 
-fresh: down clean up import
+perms:
+	sudo chown -R "$(USER):$(USER)" data log
 
-image-3.8:
-	docker build --pull --tag rabbitmq-local:latest --build-arg VERSION=3.8-management .
+rmq-perms:
+	sudo chown -R '999:999' data log
+	sudo chmod 0775 data log
+	sudo chmod 0775 data/rmq0 log/rmq0
 
-image-3.10:
-	docker build --pull --tag rabbitmq-local:latest --build-arg VERSION=3.10-management .
+up: rmq-perms
+	docker compose build --build-arg VERSION=3.10-management-alpine
+	docker compose up
 
-import:
-	$(CURDIR)/import-defs.sh
-
-up:
-	docker compose up --detach
-
-upgrade: image-3.10
-	$(CURDIR)/upgrade.sh
+upgrade: down
+	docker compose build --build-arg VERSION=3.11-management-alpine
+	docker compose up

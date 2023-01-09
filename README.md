@@ -2,32 +2,19 @@
 
 https://github.com/docker-library/rabbitmq/issues/601
 
-=======
+## Reproduction attempt
 
-## Original repo:
-
-https://github.com/lukebakken/docker-rabbitmq-cluster
-
-Branch: `upgrade`
-
-## Steps
-
-* Build RabbitMQ 3.8 image
-    ```
-    make image-3.8
-    ```
-* Start cluster
+* Start with `3.10-management-alpine`
     ```
     make up
     ```
-* Check cluster by browsing to `http://SERVER:15672`. You should see PerfTest running as well.
-* Import your defs
+* Check by browsing to `http://SERVER:15672`. You should see PerfTest running as well.
+* Stop node
     ```
-    make import
+    make down
     ```
-* Check cluster by browsing to `http://SERVER:15672`. You should see your definitions.
-* Upgrade cluster
+* Upgrade node
     ```
     make upgrade
     ```
-* Check cluster by browsing to `http://SERVER:15672`. PerfTest will be running, and all idle queues will show `0`
+* Check cluster by browsing to `http://SERVER:15672`. PerfTest will be running, and node will be upgraded.

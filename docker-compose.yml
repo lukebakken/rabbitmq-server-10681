@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  rmq0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VERSION=3.10-management-alpine
+    hostname: rmq0
+    environment:
+      - LOG=debug
+    volumes:
+      - ./data/rmq0:/var/lib/rabbitmq/mnesia
+      - ./log/rmq0:/var/log/rabbitmq
+    ports:
+      # HOST:CONTAINER
+      - 15672:15672
+  perf-test:
+    image: pivotalrabbitmq/perf-test:latest
+    command:
+      - --uri=amqp://rmq0
+      - --servers-startup-timeout=30
+      - --rate=100
+      - --producers=6
+      - --consumers=6
+      - --flag=persistent
+      - --flag=mandatory
+      - --confirm=4
+    depends_on:
+      - rmq0
+    restart: on-failure

@@ -1,4 +1,4 @@
-ARG VERSION=3.10-management-alpine
+ARG VERSION=3.12-management
 FROM rabbitmq:$VERSION
 
 COPY --chown=rabbitmq:rabbitmq --chmod=0400 erlang.cookie /var/lib/rabbitmq/.erlang.cookie

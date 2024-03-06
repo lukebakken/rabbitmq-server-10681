@@ -3,18 +3,16 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+set -o xtrace
 
-# shellcheck disable=SC2155,SC2034
-readonly dir="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
+# NB: https://github.com/docker/compose/issues/1262
+_tmp="$(docker compose ps -q rmq0)"
+readonly container_id="$_tmp"
+unset _tmp
 
-echo "[INFO] upgrading cluster!"
-
-for SVC in rmq0 rmq1 rmq2
-do
-    # NB: https://github.com/docker/compose/issues/1262
-    container_id="$(docker compose ps -q "$SVC")"
-    docker exec "$container_id" /opt/rabbitmq/sbin/rabbitmq-upgrade drain
-    docker compose stop "$SVC"
-    sleep 5
-    docker compose up --detach --build "$SVC"
-done
+docker exec "$container_id" /opt/rabbitmq/sbin/rabbitmqctl enable_feature_flag all
+docker exec "$container_id" /opt/rabbitmq/sbin/rabbitmq-upgrade drain
+docker compose stop rmq0
+sleep 5
+docker compose build --pull --build-arg VERSION=3.13-management
+docker compose up --detach rmq0

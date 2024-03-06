@@ -8,19 +8,18 @@ down:
 	docker compose down
 
 perms:
-	sudo chown -R "$(USER):$(USER)" data log
+	sudo chown -R "$$(id -u):$$(id -g)" data log
 
 rmq-perms:
-	sudo chown -R '100:101' data log
+	sudo chown -R '999:999' data log
 	sudo chmod 0755 data
 	sudo chmod 0755 data/rmq0
 	sudo chmod 0755 log
 	sudo chmod 0755 log/rmq0
 
 up: rmq-perms
-	docker compose build --build-arg VERSION=3.10-management-alpine
-	docker compose up
+	docker compose build --pull --build-arg VERSION=3.12-management
+	docker compose up --detach
 
 upgrade: down
-	docker compose build --build-arg VERSION=3.11-management-alpine
-	docker compose up
+	$(CURDIR)/upgrade.sh

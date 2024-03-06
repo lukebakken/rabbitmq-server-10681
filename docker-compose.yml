@@ -6,12 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - VERSION=3.10-management-alpine
+        - VERSION=3.12-management
     hostname: rmq0
     environment:
       - LOG=debug
     volumes:
-      - ./data/rmq0:/var/lib/rabbitmq/mnesia
+      - ./data/rmq0:/var/lib/rabbitmq
       - ./log/rmq0:/var/log/rabbitmq
     ports:
       # HOST:CONTAINER
